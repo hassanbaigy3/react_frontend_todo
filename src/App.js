@@ -1,32 +1,36 @@
-import { useState } from "react";
+import { useState ,  useEffect } from "react";
 import Header from "./components/Header";
 import Tasks from "./components/Tasks";
 import AddTask from "./components/AddTask";
+import {reactLocalStorage} from 'reactjs-localstorage';
 
 
 function App() {
 
-  const [tasks, settasks] = useState([
-        {
-          "id": 1,
-          "text": "Doctors Appointment",
-          "day": "Feb 5th at 2:30pm",
-          "reminder": true,
-          "isActive" : true
-        },
-        {
-          "id": 2,
-          "text": "Meeting at School",
-          "day": "Feb 6th at 1:30pm",
-          "reminder": true,
-          "isActive": true
+
+
+
+  const [tasks, settasks] = useState([])
+  
+      useEffect(() => {
+        const getTasks = async () => {
+          const tasksFromLocalStorage = await fetchTasks()
+           settasks(tasksFromLocalStorage)
         }
-      ])
+        getTasks()
+      }, [])
+
+      const fetchTasks = async () => {
+        const res = reactLocalStorage.getObject('tasks');
+
+        return res
+      }
     
   const addTask = (task)=>{
     const id = Math.floor(Math.random() * 10000) + 1;
-    const newTasks = {id , ...task};
-    settasks([...tasks , newTasks]);
+    const newTask = {id , ...task};
+    const res = reactLocalStorage.setObject('tasks',[...tasks,newTask]);
+    settasks(prevTasks=>([...prevTasks,newTask]));
    
   }
 
